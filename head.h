@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <time.h>
+#include <pthread.h>
 
 void blowfish_init (char key[], int keybytes);
 
@@ -10,9 +10,17 @@ unsigned long f(unsigned long x);
 
 void blowfish_encipher(unsigned long *xl, unsigned long *xr);
 
-void blowfish (FILE* fp, char key[], int keybytes);
+void blowfish (char key[], int keybytes);
 
 void blowfish_decipher(unsigned long *xl, unsigned long *xr);
+
+void file_write_long ();
+
+void file_read_char ();
+
+void create_char_list (char str[]);
+
+void create_long_list (unsigned long xl, unsigned long xr);
 
 unsigned long P[N + 2] = {
         0x243F6A88L, 0x85A308D3L, 0x13198A2EL, 0x03707344L,
