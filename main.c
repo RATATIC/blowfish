@@ -71,20 +71,20 @@ void file_read_char () {
 	}
 	while (fgets (read_buff, SIZE_OF_READ - 1, fp)) {
 		/*if (pthread_mutex_lock (&mtx2)) {
-        puts ("Failed mutex lock");
-        exit (EXIT_FAILURE);
-   	}*/
+		  puts ("Failed mutex lock");
+		  exit (EXIT_FAILURE);
+		}*/
 		create_char_list (read_buff);
 	/*
 		if (pthread_mutex_unlock (&mtx2)) {
-        puts ("Failed mutex lock");
-        exit (EXIT_FAILURE);
-   	}
+		  puts ("Failed mutex lock");
+		  exit (EXIT_FAILURE);
+		}
 
-   	if (pthread_cond_signal (&cond2)) {
-        puts ("Failed cond signal");
-        exit (EXIT_FAILURE);
-   	}*/
+		if (pthread_cond_signal (&cond2)) {
+		  puts ("Failed cond signal");
+		  exit (EXIT_FAILURE);
+		}*/
 	}
 
 	if (fclose (fp)) {
@@ -110,9 +110,9 @@ void file_write_long () {
 
 		while (top_long == NULL) {
 			if (pthread_cond_wait (&cond1, &mtx1)) {
-                puts ("Failed cond wait");
-                exit (EXIT_FAILURE);
-            }
+					 puts ("Failed cond wait");
+					 exit (EXIT_FAILURE);
+				}
 		}
 
 		if (pthread_mutex_unlock (&mtx1)) {
@@ -164,9 +164,9 @@ void blowfish (char key[], int keybytes) {
 		}
 		while (top_char == NULL) {
 			if (pthread_cond_wait (&cond2, &mtx2)) {
-                puts ("Failed cond wait");
-                exit (EXIT_FAILURE);
-            }
+					 puts ("Failed cond wait");
+					 exit (EXIT_FAILURE);
+				}
 		}
 		if (pthread_mutex_unlock (&mtx2)) {
 				puts ("Failed mutex unlock");
@@ -195,18 +195,18 @@ void blowfish (char key[], int keybytes) {
 			}
 
 			if (pthread_cond_signal (&cond1)) {
-  	      	puts ("Failed cond signal");
- 	  	     	exit (EXIT_FAILURE);
-   		}*/
-   		xl = 0;
+				puts ("Failed cond signal");
+				exit (EXIT_FAILURE);
+			}*/
+			xl = 0;
 			xr = 0;
 			offset = 0;
-   	}
+		}
 	}	
 	/*if (pthread_join (thr_read_text, NULL)) {
-      puts ("Failed join ");
-      exit (EXIT_FAILURE);
-   }*/
+		puts ("Failed join ");
+		exit (EXIT_FAILURE);
+	}*/
 
 	while (top_char != NULL) {
 		xl = LONG_FROM_CHAR (top_char->str, offset);	
@@ -230,9 +230,9 @@ void blowfish (char key[], int keybytes) {
 			exit (EXIT_FAILURE);	
 		}
 		if (pthread_cond_signal (&cond1)) {
-        puts ("Failed cond signal");
-        exit (EXIT_FAILURE);
-   	}*/
+		  puts ("Failed cond signal");
+		  exit (EXIT_FAILURE);
+		}*/
 		xl = 0;
 		xr = 0;
 		offset = 0;
@@ -240,10 +240,10 @@ void blowfish (char key[], int keybytes) {
 	flag_write = 0;
 
 	
-   if (pthread_join (thr_write_text, NULL)) {
-      puts ("Failed join ");
-      exit (EXIT_FAILURE);
-   }
+	if (pthread_join (thr_write_text, NULL)) {
+		puts ("Failed join ");
+		exit (EXIT_FAILURE);
+	}
 
 	FILE* fp_write = fopen ("decip.txt", "w");
 	FILE* fp = fopen ("encip.txt", "r");
@@ -252,7 +252,7 @@ void blowfish (char key[], int keybytes) {
 		if (xl != 0) {
 			fprintf (fp_write, "%s", read_buff);
 			fflush (fp_write);
-     		offset = 0;
+			offset = 0;
 			memset (read_buff, '\0', SIZE_OF_READ);
 			xl = 0;
 			xr = 0;
@@ -261,72 +261,72 @@ void blowfish (char key[], int keybytes) {
 		blowfish_decipher (&xl, &xr);
 		
 		for (int j = 0; j < sizeof (unsigned long); j++, offset++) {
-       	read_buff[offset] = (0xff & (xl >> (j * CHAR_SIZE)));
-     	}
-      for (int j = 0; j < sizeof (unsigned long); j++, offset++) {
-        	read_buff[offset] = (0xff & (xr >> (j * CHAR_SIZE)));
-      }
+			read_buff[offset] = (0xff & (xl >> (j * CHAR_SIZE)));
+		}
+		for (int j = 0; j < sizeof (unsigned long); j++, offset++) {
+			read_buff[offset] = (0xff & (xr >> (j * CHAR_SIZE)));
+		}
 	}
 	fclose (fp);
 	fclose (fp_write);
 }
 
 void blowfish_encipher(unsigned long *xl, unsigned long *xr) {
-   unsigned long  Xl;
-   unsigned long  Xr;
-   unsigned long  temp;
-   short          i;
+	unsigned long  Xl;
+	unsigned long  Xr;
+	unsigned long  temp;
+	short          i;
 
-   Xl = *xl;
-   Xr = *xr;
+	Xl = *xl;
+	Xr = *xr;
 
-   for (i = 0; i < N; ++i) {
-      Xl = Xl ^ P[i];
-      Xr = f(Xl) ^ Xr;
+	for (i = 0; i < N; ++i) {
+		Xl = Xl ^ P[i];
+		Xr = f(Xl) ^ Xr;
 
-      temp = Xl;
-      Xl = Xr;
-      Xr = temp;
-   }
+		temp = Xl;
+		Xl = Xr;
+		Xr = temp;
+	}
 
-   temp = Xl;
-   Xl = Xr;
-   Xr = temp;
+	temp = Xl;
+	Xl = Xr;
+	Xr = temp;
 
-   Xr = Xr ^ P[N];
-   Xl = Xl ^ P[N + 1];
+	Xr = Xr ^ P[N];
+	Xl = Xl ^ P[N + 1];
   
-   *xl = Xl;
-   *xr = Xr;
+	*xl = Xl;
+	*xr = Xr;
 }
 
 void blowfish_decipher(unsigned long *xl, unsigned long *xr) {
-   unsigned long  Xl;
-   unsigned long  Xr;
-   unsigned long  temp;
-   short          i;
+	unsigned long  Xl;
+	unsigned long  Xr;
+	unsigned long  temp;
+	short          i;
 
-   Xl = *xl;
-   Xr = *xr;
+	Xl = *xl;
+	Xr = *xr;
 
-   for (i = N + 1; i > 1; --i) {
-      Xl = Xl ^ P[i];
-      Xr = f(Xl) ^ Xr;
+	for (i = N + 1; i > 1; --i) {
+		Xl = Xl ^ P[i];
+		Xr = f(Xl) ^ Xr;
 
-      temp = Xl;
-      Xl = Xr;
-      Xr = temp;
-   }
+		temp = Xl;
+		Xl = Xr;
+		Xr = temp;
+	}
 
-   temp = Xl;
-   Xl = Xr;
-   Xr = temp;
+	temp = Xl;
+	Xl = Xr;
+	Xr = temp;
 
-   Xr = Xr ^ P[1];
-   Xl = Xl ^ P[0];
+	Xr = Xr ^ P[1];
+	Xl = Xl ^ P[0];
 
-   *xl = Xl;
-   *xr = Xr;
+	*xl = Xl;
+	*xr = Xr;
 }
 
 void blowfish_init (char key[], int keybytes) {
@@ -361,33 +361,33 @@ void blowfish_init (char key[], int keybytes) {
 	for (int i = 0; i < 4; i++) {
 		for (int j = 0; j < 256; j+=2 ) {
 			blowfish_encipher(&l, &r);
-   
-	    	S[i][j] = l;
-	    	S[i][j + 1] = r;
+	
+			S[i][j] = l;
+			S[i][j + 1] = r;
 		}
 	}
 }
 
 unsigned long f(unsigned long x) {
-   unsigned short a;
-   unsigned short b;
-   unsigned short c;
-   unsigned short d;
-   unsigned long  y;
+	unsigned short a;
+	unsigned short b;
+	unsigned short c;
+	unsigned short d;
+	unsigned long  y;
 
-   d = x & 0x00FF;
-   x >>= 8;
-   c = x & 0x00FF;
-   x >>= 8;
-   b = x & 0x00FF;
-   x >>= 8;
-   a = x & 0x00FF;
+	d = x & 0x00FF;
+	x >>= 8;
+	c = x & 0x00FF;
+	x >>= 8;
+	b = x & 0x00FF;
+	x >>= 8;
+	a = x & 0x00FF;
   
-   y = S[0][a] + S[1][b];
-   y = y ^ S[2][c];
-   y = y + S[3][d];
+	y = S[0][a] + S[1][b];
+	y = y ^ S[2][c];
+	y = y + S[3][d];
 
-   return y;
+	return y;
 }
 
 void create_char_list (char str[]) {
