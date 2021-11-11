@@ -70,12 +70,12 @@ void file_read_char () {
 		exit (EXIT_FAILURE);
 	}
 	while (fgets (read_buff, SIZE_OF_READ - 1, fp)) {
-		if (pthread_mutex_lock (&mtx2)) {
+		/*if (pthread_mutex_lock (&mtx2)) {
         puts ("Failed mutex lock");
         exit (EXIT_FAILURE);
-   	}
+   	}*/
 		create_char_list (read_buff);
-
+	/*
 		if (pthread_mutex_unlock (&mtx2)) {
         puts ("Failed mutex lock");
         exit (EXIT_FAILURE);
@@ -84,17 +84,12 @@ void file_read_char () {
    	if (pthread_cond_signal (&cond2)) {
         puts ("Failed cond signal");
         exit (EXIT_FAILURE);
-   	}
+   	}*/
 	}
 
 	if (fclose (fp)) {
 		puts ("Failed fclose");
 		exit (EXIT_FAILURE);
-	}
-	struct char_list* tmp = top_char;
-	while (tmp != NULL) {
-		puts (tmp->str);
-		tmp = tmp->next;
 	}
 	flag_read = 0;
 }
@@ -108,7 +103,7 @@ void file_write_long () {
 		exit (EXIT_FAILURE);
 	}
 	while (flag_write == 1) {
-		if (pthread_mutex_lock (&mtx1)) {
+		/*if (pthread_mutex_lock (&mtx1)) {
 			puts ("Failed mutex lock");
 			exit (EXIT_FAILURE);
 		} 
@@ -123,8 +118,7 @@ void file_write_long () {
 		if (pthread_mutex_unlock (&mtx1)) {
 			puts ("Failed mutex unlock");
 			exit (EXIT_FAILURE);
-		}
-		//printf ("%ld %ld\n", top_long->xl, top_long->xr);
+		}*/
 		while (top_long != NULL) {
 			fprintf (fp, "%ld %ld ", top_long->xl, top_long->xr);    ////////////////////////////////
 			fflush (fp);
@@ -158,12 +152,13 @@ void blowfish (char key[], int keybytes) {
 
 	flag_read = 1;
 	flag_write = 1;
+
 	pthread_create (&thr_read_text, NULL, file_read_char, NULL);
 	pthread_create (&thr_write_text, NULL, file_write_long, NULL);
 	blowfish_init (key, keybytes);
 
 	while (flag_read == 1) {
-		if (pthread_mutex_lock (&mtx2)) {
+		/*if (pthread_mutex_lock (&mtx2)) {
 			puts ("Failed mutex lock");
 			exit (EXIT_FAILURE);	
 		}
@@ -176,7 +171,7 @@ void blowfish (char key[], int keybytes) {
 		if (pthread_mutex_unlock (&mtx2)) {
 				puts ("Failed mutex unlock");
 				exit (EXIT_FAILURE);	
-		}
+		}*/
 		while (top_char != NULL) {
 			xl = LONG_FROM_CHAR (top_char->str, offset);	
 			offset += 8;
@@ -188,16 +183,12 @@ void blowfish (char key[], int keybytes) {
 
 			blowfish_encipher (&xl, &xr);
 
-			xl = 0;
-			xr = 0;
-			offset = 0;
-
-			if (pthread_mutex_lock (&mtx1)) {
+			/*if (pthread_mutex_lock (&mtx1)) {
 				puts ("Failed mutex lock");
 				exit (EXIT_FAILURE);	
-			}
+			}*/
 			create_long_list (xl, xr);
-
+/*
 			if (pthread_mutex_unlock (&mtx1)) {
 				puts ("Failed mutex unlock");	
 				exit (EXIT_FAILURE);	
@@ -206,13 +197,16 @@ void blowfish (char key[], int keybytes) {
 			if (pthread_cond_signal (&cond1)) {
   	      	puts ("Failed cond signal");
  	  	     	exit (EXIT_FAILURE);
-   		}
+   		}*/
+   		xl = 0;
+			xr = 0;
+			offset = 0;
    	}
 	}	
-	if (pthread_join (thr_read_text, NULL)) {
+	/*if (pthread_join (thr_read_text, NULL)) {
       puts ("Failed join ");
       exit (EXIT_FAILURE);
-   }
+   }*/
 
 	while (top_char != NULL) {
 		xl = LONG_FROM_CHAR (top_char->str, offset);	
@@ -225,20 +219,20 @@ void blowfish (char key[], int keybytes) {
 
 		blowfish_encipher (&xl, &xr);
 	
-		if (pthread_mutex_lock (&mtx1)) {
+		/*if (pthread_mutex_lock (&mtx1)) {
 			puts ("Failed mutex unlock");
 			exit (EXIT_FAILURE);	
-		}
+		}*/
 		create_long_list (xl, xr);
 
-		if (pthread_mutex_unlock (&mtx1)) {
+		/*if (pthread_mutex_unlock (&mtx1)) {
 			puts ("Failed mutex unlock");
 			exit (EXIT_FAILURE);	
 		}
 		if (pthread_cond_signal (&cond1)) {
         puts ("Failed cond signal");
         exit (EXIT_FAILURE);
-   	}
+   	}*/
 		xl = 0;
 		xr = 0;
 		offset = 0;
